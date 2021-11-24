@@ -132,17 +132,6 @@ b, strong {
   animation: BottomTotop 6s linear infinite 0s;
 }
 
-.inanimate-item {
-  font-size: 38px;
-  line-height: inherit;
-  display: block;
-  opacity: 0;
-  overflow: hidden;
-  position: absolute;
-  top: 0;
-  right: 0;
-  left: 0;
-}
 .animated-item:nth-child(2n+2) {
   animation-delay: 2s;
 }
