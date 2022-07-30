@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>4 Analysis | STAT 452: Project</title>
+  <meta name="description" content="This is our project" />
+  <meta name="generator" content="bookdown 0.26 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="4 Analysis | STAT 452: Project" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="This is our project" />
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="4 Analysis | STAT 452: Project" />
+  
+  <meta name="twitter:description" content="This is our project" />
+  
+
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="visualizations.html"/>
+<link rel="next" href="conclusion.html"/>
+<script src="libs/header-attrs-2.14/header-attrs.js"></script>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href = "./">STAT 452: Capstone Project</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Welcome!</a>
+<ul>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#a-little-bit-about-us"><i class="fa fa-check"></i>A little bit about us</a></li>
+</ul></li>
+<li class="chapter" data-level="1" data-path="introduction.html"><a href="introduction.html"><i class="fa fa-check"></i><b>1</b> Introduction</a></li>
+<li class="chapter" data-level="2" data-path="data.html"><a href="data.html"><i class="fa fa-check"></i><b>2</b> Data</a></li>
+<li class="chapter" data-level="3" data-path="visualizations.html"><a href="visualizations.html"><i class="fa fa-check"></i><b>3</b> Visualizations</a></li>
+<li class="chapter" data-level="4" data-path="analysis.html"><a href="analysis.html"><i class="fa fa-check"></i><b>4</b> Analysis</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="analysis.html"><a href="analysis.html#linearity"><i class="fa fa-check"></i><b>4.1</b> Linearity</a></li>
+<li class="chapter" data-level="4.2" data-path="analysis.html"><a href="analysis.html#neighborhood-structure"><i class="fa fa-check"></i><b>4.2</b> Neighborhood Structure</a></li>
+<li class="chapter" data-level="4.3" data-path="analysis.html"><a href="analysis.html#interpretation"><i class="fa fa-check"></i><b>4.3</b> Interpretation</a>
+<ul>
+<li class="chapter" data-level="4.3.1" data-path="analysis.html"><a href="analysis.html#intercept"><i class="fa fa-check"></i><b>4.3.1</b> Intercept</a></li>
+<li class="chapter" data-level="4.3.2" data-path="analysis.html"><a href="analysis.html#deficit"><i class="fa fa-check"></i><b>4.3.2</b> Deficit</a></li>
+<li class="chapter" data-level="4.3.3" data-path="analysis.html"><a href="analysis.html#hispanic"><i class="fa fa-check"></i><b>4.3.3</b> Hispanic</a></li>
+<li class="chapter" data-level="4.3.4" data-path="analysis.html"><a href="analysis.html#white"><i class="fa fa-check"></i><b>4.3.4</b> White</a></li>
+<li class="chapter" data-level="4.3.5" data-path="analysis.html"><a href="analysis.html#black"><i class="fa fa-check"></i><b>4.3.5</b> Black</a></li>
+<li class="chapter" data-level="4.3.6" data-path="analysis.html"><a href="analysis.html#foreign-born"><i class="fa fa-check"></i><b>4.3.6</b> Foreign-born</a></li>
+<li class="chapter" data-level="4.3.7" data-path="analysis.html"><a href="analysis.html#per-capita-income"><i class="fa fa-check"></i><b>4.3.7</b> Per-capita Income</a></li>
+</ul></li>
+<li class="chapter" data-level="4.4" data-path="analysis.html"><a href="analysis.html#residuals"><i class="fa fa-check"></i><b>4.4</b> Residuals</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="conclusion.html"><a href="conclusion.html"><i class="fa fa-check"></i><b>5</b> Conclusion</a></li>
+<li class="chapter" data-level="6" data-path="limitations.html"><a href="limitations.html"><i class="fa fa-check"></i><b>6</b> Limitations</a></li>
+<li class="chapter" data-level="7" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i><b>7</b> References</a></li>
+<li class="divider"></li>
+<li><a href="https://bookdown.org" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">STAT 452: Project</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="analysis" class="section level1" number="4">
+<h1><span class="header-section-number">4</span> Analysis</h1>
+<p>As we begin the analysis portion or our project, we asked ourselves, what factors always have influence in national elections? Of course, the amount of people that are registered and the amount of people that go to the polls that are registered play a big part. We also wanted to compare across major ethnicities in Texas, rural vs. urban, and income disparity in the state. We felt that these three factors in addition to registration and turnout would allow us to be able to get a good cross-section of the 2016 election in Texas.</p>
+<div id="linearity" class="section level2" number="4.1">
+<h2><span class="header-section-number">4.1</span> Linearity</h2>
+<p>The first part of our modeling process was to look at a linear model with our variables to see what the residuals would look like and to test if all of our variables have linearity. The variable that we are attempting to model results around is the vote difference which is a variable that is on a scale from -1 to 1, 1 being a county voted 100% for Trump and -1 being 100% voted for Clinton. The variables that we used to try and predict the vote difference are the proportion of Hispanic, White, Black and Foreign-born voters, the voter turnout deficit, and each county’s per-capita income.</p>
+<p><img src="stat452_project_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p>After producing our preliminary linear model and residual map, we found that not every variable had a linear pattern against vote difference (see above). Three of them (deficit, foreign-born and per-capita income) had a quadratic relationship against the vote difference. As a result, we split those three variables into splines so that within each section, the relationship is linearly correlated to the vote difference. For example, we split per-capita income into “income_hi” and “income_low” where the split occurs at 40000 and both variables are now linear. However, when we did a linear model including the split variables, we saw that there was very little change in the residual maps, leading us to believe that there was more work to be done to explain the spatial relationships between the counties.</p>
+<p><img src="stat452_project_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+</div>
+<div id="neighborhood-structure" class="section level2" number="4.2">
+<h2><span class="header-section-number">4.2</span> Neighborhood Structure</h2>
+<p>The next step is to figure out which type of neighbors we want and what type of spatial model we want to use. What we mean by different types of neighbors in this context, is figuring out how we want to evaluate how related each county is to one another.</p>
+<p>There are three possible neighborhood structures that we can use. A Queen neighborhood structure will see two counties as neighbors if they share at least one point on their boundaries. A Rook neighborhood structure is more selective and will see two counties as neighbors only if they share a line boundary. The Bishop neighborhood structure (displayed below) does not apply to our analysis, so we will not include it in our future modeling processes.</p>
+<div class="figure">
+<img src="img/nbhd.png" alt="" />
+<p class="caption">Three neighborhood structures</p>
+</div>
+<p>The different types of spatial models are also important to understand as we look at SAR and CAR models. A CAR model (Conditional Auto-Regressive model) is used for more local relationships and works more toward depth with a smaller number of spaces, whereas a SAR model (Simultaneous Auto-Regressive model) is used more in global relationships and has more to do with breadth across large number of spaces.</p>
+<p>Using these two pairs of components, we created four models as such: the Queen SAR, Queen CAR, Rook SAR and Rook CAR. When building these models, the main things that we looked at to test their efficacy were the p-values of each variable and the BIC (Bayesian Information Criterion) that gives a unit-less number to determine the quality of each model.</p>
+<p>Of these 4 models, the worst was the Queen CAR model as the BIC was far too high and the variable p-values did not produce accurate numbers. The remaining three models were all very close in terms of BIC with the lowest (the best) being the Queen SAR and the variable p-values were all very similar as well so we had to look at what is called a Moran’s I test. In a Moran’s I test, we are looking for the highest p-value for independence and a statistic around zero. The Rook CAR model was the worst of the three as the p-value was below .05, and the statistic was about -.19 which indicates the model is not independent and there is still unexplained spatial correlation. The Rook SAR model is better as the p-value is at .09 above the .05 threshold and the statistic is -.06 which is fairly close to zero. However, the Queen SAR model is the best as its p-value is well above ,05 at .3142 and the statistic is -.043, the closest to zero of all our Moran’s I tests on the models. As a result, we ended up selecting the Queen SAR model to model our data.</p>
+</div>
+<div id="interpretation" class="section level2" number="4.3">
+<h2><span class="header-section-number">4.3</span> Interpretation</h2>
+<div id="intercept" class="section level3" number="4.3.1">
+<h3><span class="header-section-number">4.3.1</span> Intercept</h3>
+<p>Now that we have chosen the Queen SAR model to be what we model after, we can start to look more closely at how to interpret the results that we have produced. The output for our Queen SAR Model is very interesting because the intercept is -1.35 for vote difference and the scale for this variable is -1 to 1. This may seem like an error, but this is assuming that a county has 0% white, hispanic, black or foreign-born population and the people who live in this county have high income and low voter turnout deficit. All of this to say, this is an impossible county so the intercept is given an impossible number, but it helps us figure out how each variable we look at affects the intercept for each county.</p>
+</div>
+<div id="deficit" class="section level3" number="4.3.2">
+<h3><span class="header-section-number">4.3.2</span> Deficit</h3>
+<p>The first variable in our output is the deficit_hi variable and its estimate value is -.029 with a standard error of .0209. Importantly, this is the only variable in our output that has a p-value above .05 and that means that this variable may not be as good of a response variable as the other variables because it is not statistically significant. However, we can still learn a lot from this. According to our output, if a county has a “high voter turnout deficit,” we can assume that they will vote democratically by .029 percentage points compared to the intercept. This is interesting because our intercept is already so democratic (-1.35) any variable that is negative in the output is very likely going to reflect that that variable leads to democratic voting. In fact, every variable that we look at after is positive, but that is because of the intercept starting as negative as it does.</p>
+</div>
+<div id="hispanic" class="section level3" number="4.3.3">
+<h3><span class="header-section-number">4.3.3</span> Hispanic</h3>
+<p>The second variable we look at is the Hispanic variable and its estimate value is 1.335 with a standard error of .326. This variable was calculated as a proportion to the rest of the population, so if you take the proportion of Hispanic people in a county and multiply it by the estimate value and add it to the intercept you would get an estimate for how that county would vote based on Hispanic population. In fact, this is the same for every variable that we look at that involves a percentage of the population. One more important thing to note about this variable is that it has a very low p-value, telling us that this is statistically significant and is informative of the vote difference in any given county.</p>
+</div>
+<div id="white" class="section level3" number="4.3.4">
+<h3><span class="header-section-number">4.3.4</span> White</h3>
+<p>Our next variable that we looked at is the proportion of White people in each county, its estimate value is 2.37 with a standard error of .339. Just like the Hispanic variable, the White variable is based on its proportion to the population and can be calculated in the same way we calculated the vote difference based on the Hispanic population. However, the White variable is significantly higher and seeing the vote difference results of some panhandle counties with mostly white populations, it would make sense that the variable is so high. Also similar to the Hispanic variable, the p-value is very low and therefore statistically significant.</p>
+</div>
+<div id="black" class="section level3" number="4.3.5">
+<h3><span class="header-section-number">4.3.5</span> Black</h3>
+<p>Much like the first two variables, the Black variable is a proportion as well and its estimate value is .876 and its standard error is .419. In Texas, there is not a significant Black population compared to White and Hispanic populations, but it is still important to include them considering their impact on elections. Even though their estimate is positive, Counites with a higher Black population in Texas tend to vote more democratic than counties with high White and high Hispanic populations because their estimate is lower than both of those variables. The p-value for the Black variable is significantly low as well.</p>
+</div>
+<div id="foreign-born" class="section level3" number="4.3.6">
+<h3><span class="header-section-number">4.3.6</span> Foreign-born</h3>
+<p>Our last variable based on the proportion of the population is the Foreign-born variable, its estimate is .052 and its standard error is .023. In most counties in Texas, the foreign-born population makes up less than 10% of the population and in some cases foreign born immigrants are not granted voting rights until they are fully fledged citizens. However, we felt it was important to include them as not the foriegn-born population in Texas continues to rise each year. Per the estimate, counties with higher foreign-born populations tend to vote more democratically. That means that counties with higher rates of foreign-born and minority citizens, will likely vote more democratically. The p-value was also low for this variable and thus statistically significant.</p>
+</div>
+<div id="per-capita-income" class="section level3" number="4.3.7">
+<h3><span class="header-section-number">4.3.7</span> Per-capita Income</h3>
+<p>Lastly, we look at income and the estimate .062 with a standard error of .0216. The way that this variable was created was by making a binary for each county based on if the per-capita income was above or below $40,000. The variable we selected for this model was the low income, meaning that if a county’s per-capita income is below 40,000 they county will vote .062 percentage points towards Republicans. Like most of the variables above, even though they are positive, it does not mean that they vote more Republican, because of the intercept being so negative, a small increase likely means that it is more democratic. The p-value for this variable is low and statistically significant as well.</p>
+</div>
+</div>
+<div id="residuals" class="section level2" number="4.4">
+<h2><span class="header-section-number">4.4</span> Residuals</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="analysis.html#cb1-1" aria-hidden="true" tabindex="-1"></a>txwinning <span class="sc">%&gt;%</span> <span class="fu">st_make_valid</span>() <span class="sc">%&gt;%</span> <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb1-2"><a href="analysis.html#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="fu">aes</span>(<span class="at">fill =</span> lm_resid), <span class="at">color =</span> <span class="st">&quot;grey&quot;</span>) <span class="sc">+</span></span>
+<span id="cb1-3"><a href="analysis.html#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_gradient2</span>(<span class="at">mid =</span> <span class="st">&quot;white&quot;</span>, <span class="at">high =</span> <span class="st">&quot;red&quot;</span>, <span class="at">low =</span> <span class="st">&quot;blue&quot;</span>) <span class="sc">+</span> <span class="fu">theme_classic</span>() <span class="sc">+</span></span>
+<span id="cb1-4"><a href="analysis.html#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf_text</span>(<span class="at">data =</span> majorcities<span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="sc">!</span>(city  <span class="sc">==</span> <span class="st">&#39;Fort Worth&#39;</span>)), <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">label =</span> city), <span class="at">color =</span> <span class="st">&quot;black&quot;</span>) <span class="sc">+</span></span>
+<span id="cb1-5"><a href="analysis.html#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Linear Model Residuals for Vote Difference in Texas&quot;</span>, <span class="at">fill =</span> <span class="st">&quot;Residuals&quot;</span>) <span class="sc">+</span></span>
+<span id="cb1-6"><a href="analysis.html#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.line =</span> <span class="fu">element_blank</span>(), </span>
+<span id="cb1-7"><a href="analysis.html#cb1-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.text =</span> <span class="fu">element_blank</span>(), </span>
+<span id="cb1-8"><a href="analysis.html#cb1-8" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.ticks =</span> <span class="fu">element_blank</span>())</span></code></pre></div>
+<pre><code>## Warning in st_point_on_surface.sfc(sf::st_zm(x)): st_point_on_surface may not give correct results for longitude/
+## latitude data</code></pre>
+<p><img src="stat452_project_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="analysis.html#cb3-1" aria-hidden="true" tabindex="-1"></a>txwinning <span class="sc">%&gt;%</span> <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb3-2"><a href="analysis.html#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="fu">aes</span>(<span class="at">fill =</span> q_mod_sar_resid), <span class="at">color =</span> <span class="st">&quot;grey&quot;</span>) <span class="sc">+</span></span>
+<span id="cb3-3"><a href="analysis.html#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_gradient2</span>(<span class="at">mid =</span> <span class="st">&quot;white&quot;</span>, <span class="at">high =</span> <span class="st">&quot;red&quot;</span>, <span class="at">low =</span> <span class="st">&quot;blue&quot;</span>,<span class="at">labels =</span> scales<span class="sc">::</span>comma) <span class="sc">+</span></span>
+<span id="cb3-4"><a href="analysis.html#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>() <span class="sc">+</span></span>
+<span id="cb3-5"><a href="analysis.html#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf_text</span>(<span class="at">data =</span> majorcities<span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="sc">!</span>(city  <span class="sc">==</span> <span class="st">&#39;Fort Worth&#39;</span>)), <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">label =</span> city), <span class="at">color =</span> <span class="st">&quot;black&quot;</span>) <span class="sc">+</span></span>
+<span id="cb3-6"><a href="analysis.html#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Queen SAR Model Residuals for Vote Difference in Texas&quot;</span>, <span class="at">fill =</span> <span class="st">&quot;Residuals&quot;</span>) <span class="sc">+</span></span>
+<span id="cb3-7"><a href="analysis.html#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>() <span class="sc">+</span></span>
+<span id="cb3-8"><a href="analysis.html#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.line =</span> <span class="fu">element_blank</span>(), </span>
+<span id="cb3-9"><a href="analysis.html#cb3-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.text =</span> <span class="fu">element_blank</span>(), </span>
+<span id="cb3-10"><a href="analysis.html#cb3-10" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.ticks =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb3-11"><a href="analysis.html#cb3-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.title =</span> <span class="fu">element_blank</span>())</span></code></pre></div>
+<pre><code>## Warning in st_point_on_surface.sfc(sf::st_zm(x)): st_point_on_surface may not give correct results for longitude/
+## latitude data</code></pre>
+<p><img src="stat452_project_files/figure-html/unnamed-chunk-10-2.png" width="672" /></p>
+<p>Here, we have our final residual map based on our Queen SAR Model. We are comparing it to our original linear model which has much more drastic residuals as well as some visible patterns which are ironed out in the Queen SAR map. We can see that in our model we have explained much of the larger outliers compared to the linear model’s map and the counties are much more evenly distributed in terms of red and blue counties. There are some interesting things that we still notice from our map though, one of them is the very high residual in Travis county where Austin is located. This means that even after adjusting for our model, the vote difference in Austin is still very high for democrats and that is something our model cannot explain. There is similar high blue residuals in El Paso and Dallas and I wonder if we had added a variable that took into account if a county contained a “large city” we could have tempered those outliers.</p>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="visualizations.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="conclusion.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": false,
+"twitter": false,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": null,
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "section"
+}
+});
+});
+</script>
+
+</body>
+
+</html>

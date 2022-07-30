@@ -1,0 +1,33 @@
+--- 
+title: "STAT 452: Project"
+site: bookdown::bookdown_site
+output:
+  bookdown::gitbook:
+    config:
+      sharing:
+        facebook: false
+        twitter: false
+documentclass: book
+link-citations: yes
+description: "This is our project"
+bibliography: Library.bib
+---
+
+# Welcome!  {-}
+
+Hi! This is a class project created by Ethan Deutsch and Sam Ding for STAT 452 Correlated Data, instructed by Professor Brianna Heggeseth. In this project, we used spatial correlated data to explore the US presidential election in 2016 in Texas.
+
+## A little bit about us {-}
+
+**Ethan Deutsch '22** is a senior at Macalester College majoring in Statistics. He plays golf in free time and has a significant presence in Macalester Athletics as a golfer and a runner.
+
+**Sam Ding '22** is a senior at Macalester College majoring in Statistics and Media & Cultural Studies. He is the timpanist in Macalester Symphony Orchestra. In his free time, Sam likes to travel, listen to classical music, and spend time in photography.
+
+
+<br>
+<br>
+<br>
+
+![](img/cc_license_button.png)
+
+This work is licensed under a [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](https://creativecommons.org/licenses/by-nc-sa/4.0/).

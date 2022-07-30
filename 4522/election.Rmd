@@ -1,0 +1,311 @@
+---
+title: "Election"
+author: "Sam Ding, Ethan Deustch"
+date: "4/5/2022"
+output: html_document
+---
+```{r}
+library(dplyr)
+library(readr)
+library(stringr)
+library(tidyverse)
+library(tidycensus)
+library(tigris)
+library(ggplot2)
+library(sf)
+#install.packages('spatialreg')
+library(spatialreg)
+library(spdep)
+library(splines)
+library(ggpubr)
+```
+
+```{r}
+# cleaning the data and joining
+census_api_key("b2705853638543a5e2116352f603a6f1c6daab86")
+tx <- read_csv("tx.csv") # base data with all counties in TX and number of votes
+vr <- read_csv("voter_registration_tx.csv") # included the number of registered voters in each county
+popest <- read_csv("2016_txpopest_county.csv") # included the population of each county
+majorcities <- read_csv("tx_majorCities.csv") # major cities for the map
+demographics <- read_csv("demographics_2020.csv") # included demographic data of each county
+income <- read_csv("income.csv")
+counties_spatial <- counties("Texas", cb = TRUE) %>%
+  mutate(county_name = NAME)
+
+
+majorcities <- majorcities %>% st_as_sf(coords = c("long", "lat"))
+
+
+
+tx <- tx %>% select(-c(candidate_normalized, candidate_opensecrets, candidate_wikidata, candidate_party, candidate_last, candidate_first, candidate_full, candidate_party, candidate_suffix, candidate_middle, candidate_middle, candidate_fec, candidate_fec_name, candidate_nickname, candidate_google, candidate_govtrack, candidate_maplight, candidate_icpsr))
+
+tx <- tx %>% select(-c(...1, year, stage, special, jurisdiction, office, district, writein, mode))
+
+tx <- tx %>% 
+  group_by(county_name, candidate) %>% 
+  summarize(votes_county = sum(votes), state,  state_icpsr, state_postal, county_name, county_fips, county_ansi, county_lat, county_long) %>% 
+  distinct() %>%
+  mutate(county_name = substr(county_name, 1, nchar(county_name)-7)) 
+
+tx <- tx %>% group_by(county_name) %>%
+  mutate(vote_diff_RD =( votes_county[candidate == 'Donald Trump'] - votes_county[candidate == 'Hillary Clinton'])/sum(votes_county)) %>%
+  mutate(total_votes = sum(votes_county)) %>% ungroup()
+
+demographics <- demographics %>%
+  mutate(county_name = substr(county_name, 1, nchar(county_name)-14)) %>%
+  mutate(hispanic= `Hispanic or Latino` / Total) %>%
+  mutate(non_hispanic= `Not Hispanic or Latino:` / Total) %>%
+  mutate(white = `White alone` / Total) %>%
+  mutate(black = `Black or African American alone` / Total) %>%
+  mutate(native = `American Indian and Alaska Native alone`/ Total) %>%
+  mutate(asian = `Asian alone` / Total) %>%
+  mutate(pacific = `Native Hawaiian and Other Pacific Islander alone` / Total) %>%
+  mutate(others = `Some Other Race alone`/ Total) %>%
+  mutate(foreign = `Foreign Born` / Total) %>%
+  mutate(total = Total) %>%
+  select(c(county_name, total, hispanic, non_hispanic, white, black, native, asian, pacific, foreign, others))
+  
+
+vr <- vr %>%
+  mutate(county_name = str_to_title(county_name))
+
+
+income <- income %>%
+  mutate(per_capita_income = as.numeric(paste(substr(per_capita_income, 2, 3), substr(per_capita_income, 5, nchar(per_capita_income)), sep="")))
+
+
+tx <- tx %>% left_join(vr)
+tx <- tx %>% left_join(popest)
+tx <- tx %>% left_join(demographics)
+tx <- tx %>% left_join(income)
+```
+
+```{r}
+
+tx <- tx %>%
+  left_join(counties_spatial,.) %>%
+  mutate(vr_to_vote = total_votes/voter_registration)
+
+txwinning <- tx %>%
+  group_by(county_name) %>%
+  mutate(winning = ifelse(votes_county == max(votes_county), 1, 0)) %>%
+  filter(winning == 1) %>%
+  na.omit()
+
+st_crs(majorcities) = st_crs(txwinning)
+
+txwinning %>%
+  st_make_valid() %>%
+  ggplot() +
+  geom_sf(aes(fill = candidate),color = "black", size = 0.25, alpha = .8) + theme_void() +
+  geom_sf_text(data = majorcities %>% filter(!(city  == 'Fort Worth')), mapping = aes(label = city), color = "gold") + 
+  scale_fill_manual(values = c("#CC2B1D", "#0023B3")) +
+  labs(fill = 'Winning Candidate')
+```
+
+```{r}
+txwinning %>%
+  st_make_valid() %>%
+  ggplot() +
+  geom_sf(aes(fill = vote_diff_RD),color = "black",size = 0.25,alpha=.8) + theme_void() + 
+  geom_sf_text(data = majorcities%>% filter(!(city  == 'Fort Worth')), mapping = aes(label = city), color = "black") + 
+  scale_fill_gradient2(mid = "white", high = "#CC2B1D", low = "#0023B3")  +
+  labs(fill = 'Voter Difference (Trump - Clinton)')
+
+tx <- tx %>% 
+  mutate(vr_prop = voter_registration/july1_2016_pop_est)
+
+tx %>%
+  filter(vr_prop < 1) %>% 
+  st_make_valid() %>%
+  ggplot() + 
+  geom_sf(aes(fill = vr_prop), color = "black", size = .25) + theme_void() +
+  geom_sf_text(data = majorcities%>% filter(!(city  == 'Fort Worth')), mapping = aes(label = city), color = "gold") +
+  labs(fill = 'Proportion of Voters that are Registered')
+
+tx %>%
+  filter(vr_prop < 1) %>% 
+  st_make_valid() %>%
+  ggplot() + 
+  geom_sf(aes(fill = hispanic), color = "black", size = .25) + theme_void() + 
+  geom_sf_text(data = majorcities%>% filter(!(city  == 'Fort Worth')), mapping = aes(label = city), color = "gold") +
+  labs(fill = 'Proportion of Voters that are Hispanic')
+
+tx %>%
+  filter(vr_prop < 1) %>% 
+  st_make_valid() %>%
+  ggplot() + 
+  geom_sf(aes(fill = white), color = "black", size = .25) + theme_void() + 
+  geom_sf_text(data = majorcities%>% filter(!(city  == 'Fort Worth')), mapping = aes(label = city), color = "gold") +
+  labs(fill = 'Proportion of Voters that are White')
+```
+
+```{r}
+txwinning <- txwinning %>% 
+  mutate(target_turnout = 0.6*voter_registration) %>%
+  mutate(deficit = (target_turnout - votes_county)/total)
+
+txwinning %>%
+  ggplot() + 
+  geom_sf(aes(fill = deficit), color = "black", size = .25) + theme_void() + 
+  geom_sf_text(data = majorcities%>% filter(!(city  == 'Fort Worth')), mapping = aes(label = city), color = "black") + 
+  scale_fill_gradient2(mid = "white", high = "red", low = "green")
+
+```
+
+```{r}
+lm_mod <- lm(vote_diff_RD ~ deficit + hispanic + white + black + foreign + per_capita_income, data = txwinning)
+
+txwinning$lm_resid <- resid(lm_mod)
+
+txwinning %>% st_make_valid() %>% ggplot() +
+  geom_sf(aes(fill = lm_resid)) +
+  scale_fill_gradient2(mid = "white", high = "red", low = "blue") + theme_classic()
+```
+
+```{r}
+txwinning %>%
+  ggplot(aes(y = vote_diff_RD, x = deficit))+
+  geom_point() +
+  geom_smooth(se=FALSE, color = "gray")
+
+txwinning %>%
+  ggplot(aes(y = vote_diff_RD, x = hispanic))+
+  geom_point() +
+  geom_smooth(se=FALSE, color = "gray")
+
+txwinning %>%
+  ggplot(aes(y = vote_diff_RD, x = white))+
+  geom_point() +
+  geom_smooth(se=FALSE, color = "gray")
+
+txwinning %>%
+  ggplot(aes(y = vote_diff_RD, x = black))+
+  geom_point() +
+  geom_smooth(se=FALSE, color = "gray")
+
+txwinning %>%
+  ggplot(aes(y = vote_diff_RD, x = foreign))+
+  geom_point() +
+  geom_smooth(se=FALSE, color = "gray")
+
+txwinning %>%
+  ggplot(aes(y = vote_diff_RD, x = per_capita_income))+
+  geom_point() +
+  geom_smooth(se=FALSE, color = "gray")
+```
+
+```{r}
+txwinning <- txwinning %>%
+  mutate(deficit_hi = ifelse(deficit >= .1, 1, 0),
+         deficit_low = ifelse(deficit < .1 && deficit > -.1, 1, 0),
+         foreign_hi = ifelse(foreign > .1, 1, 0),
+         foreign_low = ifelse(foreign < .1, 1, 0),
+         income_hi = ifelse(per_capita_income >= 40000, 1, 0),
+         income_low = ifelse(per_capita_income < 40000, 1, 0))
+
+lm_mod_splines <- lm(vote_diff_RD ~ deficit_hi + hispanic + white + black + foreign_hi + income_low, data = txwinning)
+
+txwinning$lm_resid_splines <- resid(lm_mod_splines)
+
+txwinning %>% st_make_valid() %>% ggplot() +
+  geom_sf(aes(fill = lm_resid_splines)) +
+  scale_fill_gradient2(mid = "white", high = "red", low = "blue") + theme_classic() +
+  geom_sf_text(data = majorcities%>% filter(!(city  == 'Fort Worth')), mapping = aes(label = city), color = "black") +
+  labs(title = "Split Linear Residual Map", fill = "Residuals") +
+  theme(axis.title = element_blank(), 
+        axis.text = element_blank(), 
+        axis.ticks = element_blank(),
+        axis.line = element_blank())
+
+  txwinning %>%
+  mutate(var = ifelse(deficit_hi==1 && foreign_hi==1 && income_low ==1, "Match", "Non-match")) %>%
+  st_make_valid() %>% ggplot() +
+  geom_sf(aes(fill=var), alpha = .75) + 
+  scale_fill_manual(values = c("green", "red")) +
+  theme_classic() +
+  theme(axis.line = element_blank(), 
+        axis.text = element_blank(), 
+        axis.ticks = element_blank()) +
+  labs(fill = "Counties that are:
+       -Below 60% Voter Turnout, 
+       -Above 10% Foreign-born Population 
+       -Average Income below $40,000")
+```
+
+```{r}
+#Brianna: Start with a linear regression and scatterplots of the x variables and your outcome and then map the residuals before trying a SAR model. You want to make sure that these relationships are actually linear (or non-linear) first.
+
+queen <- poly2nb(txwinning, queen = TRUE)
+rook <- poly2nb(txwinning, queen = FALSE)
+Qw <- nb2listw(queen, style = "W")
+Rw <- nb2listw(rook, style = "W")
+
+q_mod_sar <- spautolm(formula = vote_diff_RD ~ deficit_hi + hispanic + white + black + foreign_hi + income_low, data = txwinning, listw = Qw, family = "SAR")
+
+summary(q_mod_sar)
+q_mod_car <- spautolm(formula = vote_diff_RD ~ deficit_hi + hispanic + white + black + foreign_hi + income_low, data = txwinning, listw = Qw, family = "CAR") 
+
+summary(q_mod_car)
+
+r_mod_sar <- spautolm(formula = vote_diff_RD ~ deficit_hi + hispanic + white + black + foreign_hi + income_low, data = txwinning, listw = Rw, family = "SAR")
+
+summary(r_mod_sar)
+
+r_mod_car <- spautolm(formula = vote_diff_RD ~ deficit_hi + hispanic + white + black + foreign_hi + income_low, data = txwinning, listw = Rw, family = "CAR")
+
+summary(r_mod_car)
+
+#Brianna: you need the weighted version for the models, binary for Moran's I.
+```
+
+```{r}
+BIC(q_mod_sar)
+BIC(q_mod_car)
+BIC(r_mod_sar)
+BIC(r_mod_car)
+```
+
+```{r}
+Wb <- nb2listw(rook, style = "B")
+spdep::moran.test(txwinning$lm_resid, Wb, alternative = "two.sided", randomisation = TRUE)
+spdep::moran.test(txwinning$lm_resid_splines, Wb, alternative = "two.sided", randomisation = TRUE)
+
+txwinning$q_mod_sar_resid <- resid(q_mod_sar)
+spdep::moran.test(txwinning$q_mod_sar_resid, Wb, alternative = "two.sided", randomisation = TRUE)
+
+txwinning$r_mod_car_resid <- resid(r_mod_car)
+spdep::moran.test(txwinning$r_mod_car_resid, Wb, alternative = "two.sided", randomisation = TRUE)
+```
+
+```{r}
+txwinning %>% ggplot() +
+  geom_sf(aes(fill = q_mod_sar_resid)) +
+  scale_fill_gradient2(mid = "white", high = "red", low = "blue",labels = scales::comma) +
+  theme_classic()+
+  labs(title = "SAR model residuals for Vote Difference in Texas", fill = "Residuals") +
+  theme_classic() +
+  theme(axis.line = element_blank(), 
+        axis.text = element_blank(), 
+        axis.ticks = element_blank())
+```
+
+
+```{r}
+#Ethan: Are the contents of this R-chunk necessary or is there a better way to do this?
+
+tx_centroids <- st_centroid(st_geometry(txwinning), of_largest_polygon = TRUE)
+nb_rook_net <- nb2lines(nb = rook, coords = tx_centroids, as_sf = TRUE)
+
+txwinning %>%
+  ggplot()+
+  geom_sf(data = txwinning, color = "gray", fill="orange")+
+  geom_sf(data= tx_centroids)+
+  geom_sf(data = nb_rook_net)+
+  theme_classic()+
+  labs(title = "Rook neighborhood structure for Texas Counties 2016")+
+  theme(axis.line = element_blank(), 
+        axis.text = element_blank(), 
+        axis.ticks = element_blank())
+```
+
