@@ -1,0 +1,124 @@
+```{r, include=FALSE}
+library(dplyr)
+library(readr)
+library(stringr)
+library(tidyverse)
+library(tidycensus)
+library(tigris)
+library(ggplot2)
+library(sf)
+library(spatialreg)
+library(spdep)
+library(splines)
+```
+
+```{r, include=FALSE}
+# cleaning the data and joining
+census_api_key("b2705853638543a5e2116352f603a6f1c6daab86")
+tx <- read_csv("tx.csv") # base data with all counties in TX and number of votes
+vr <- read_csv("voter_registration_tx.csv") # included the number of registered voters in each county
+popest <- read_csv("2016_txpopest_county.csv") # included the population of each county
+majorcities <- read_csv("tx_majorCities.csv") # major cities for the map
+demographics <- read_csv("demographics_2020.csv") # included demographic data of each county
+income <- read_csv("income.csv")
+counties_spatial <- counties("Texas", cb = TRUE) %>%
+  mutate(county_name = NAME)
+
+
+majorcities <- majorcities %>% st_as_sf(coords = c("long", "lat"))
+
+
+
+tx <- tx %>% select(-c(candidate_normalized, candidate_opensecrets, candidate_wikidata, candidate_party, candidate_last, candidate_first, candidate_full, candidate_party, candidate_suffix, candidate_middle, candidate_middle, candidate_fec, candidate_fec_name, candidate_nickname, candidate_google, candidate_govtrack, candidate_maplight, candidate_icpsr))
+
+tx <- tx %>% select(-c(...1, year, stage, special, jurisdiction, office, district, writein, mode))
+
+tx <- tx %>% 
+  group_by(county_name, candidate) %>% 
+  summarize(votes_county = sum(votes), state,  state_icpsr, state_postal, county_name, county_fips, county_ansi, county_lat, county_long) %>% 
+  distinct() %>%
+  mutate(county_name = substr(county_name, 1, nchar(county_name)-7)) 
+
+tx <- tx %>% group_by(county_name) %>%
+  mutate(vote_diff_RD =( votes_county[candidate == 'Donald Trump'] - votes_county[candidate == 'Hillary Clinton'])/sum(votes_county)) %>%
+  mutate(total_votes = sum(votes_county)) %>% ungroup()
+
+demographics <- demographics %>%
+  mutate(county_name = substr(county_name, 1, nchar(county_name)-14)) %>%
+  mutate(hispanic= `Hispanic or Latino` / Total) %>%
+  mutate(non_hispanic= `Not Hispanic or Latino:` / Total) %>%
+  mutate(white = `White alone` / Total) %>%
+  mutate(black = `Black or African American alone` / Total) %>%
+  mutate(native = `American Indian and Alaska Native alone`/ Total) %>%
+  mutate(asian = `Asian alone` / Total) %>%
+  mutate(pacific = `Native Hawaiian and Other Pacific Islander alone` / Total) %>%
+  mutate(others = `Some Other Race alone`/ Total) %>%
+  mutate(foreign = `Foreign Born` / Total) %>%
+  mutate(total = Total) %>%
+  select(c(county_name, total, hispanic, non_hispanic, white, black, native, asian, pacific, foreign, others))
+  
+
+vr <- vr %>%
+  mutate(county_name = str_to_title(county_name))
+
+
+income <- income %>%
+  mutate(per_capita_income = as.numeric(paste(substr(per_capita_income, 2, 3), substr(per_capita_income, 5, nchar(per_capita_income)), sep="")))
+
+
+tx <- tx %>% left_join(vr)
+tx <- tx %>% left_join(popest)
+tx <- tx %>% left_join(demographics)
+tx <- tx %>% left_join(income)
+
+tx <- tx %>%
+  left_join(counties_spatial,.) %>%
+  mutate(vr_to_vote = total_votes/voter_registration)
+
+txwinning <- tx %>%
+  group_by(county_name) %>%
+  mutate(winning = ifelse(votes_county == max(votes_county), 1, 0)) %>%
+  filter(winning == 1) %>%
+  na.omit()
+
+st_crs(majorcities) = st_crs(txwinning)
+
+tx <- tx %>% 
+  mutate(vr_prop = voter_registration/july1_2016_pop_est)
+
+txwinning <- txwinning %>% 
+  mutate(target_turnout = 0.6*voter_registration) %>%
+  mutate(deficit = (target_turnout - votes_county)/total)
+
+lm_mod <- lm(vote_diff_RD ~ deficit + hispanic + white + black + foreign + per_capita_income, data = txwinning)
+txwinning$lm_resid <- resid(lm_mod)
+
+txwinning <- txwinning %>%
+  mutate(deficit_hi = ifelse(deficit >= .1, 1, 0),
+         deficit_low = ifelse(deficit < .1 && deficit > -.1, 1, 0),
+         foreign_hi = ifelse(foreign > .1, 1, 0),
+         foreign_low = ifelse(foreign < .1, 1, 0),
+         income_hi = ifelse(per_capita_income >= 40000, 1, 0),
+         income_low = ifelse(per_capita_income < 40000, 1, 0))
+
+lm_mod_splines <- lm(vote_diff_RD ~ deficit_hi + hispanic + white + black + foreign_hi + income_low, data = txwinning)
+txwinning$lm_resid_splines <- resid(lm_mod_splines)
+
+queen <- poly2nb(txwinning, queen = TRUE)
+rook <- poly2nb(txwinning, queen = FALSE)
+Qw <- nb2listw(queen, style = "W")
+
+q_mod_sar <- spautolm(formula = vote_diff_RD ~ deficit_hi + hispanic + white + black + foreign_hi + income_low, data = txwinning, listw = Qw, family = "SAR")
+summary(q_mod_sar)
+
+Wb <- nb2listw(rook, style = "B")
+txwinning$q_mod_sar_resid <- resid(q_mod_sar)
+```
+
+# Introduction
+
+In November 2016, the US presidential election results came out as a shattering surprise to voters across the country. In many states, the standoff between the final two candidates, businessman Donald J. Trump and former Secretary of State Hillary R. Clinton, reversed at the last minute and went beyond major media's predictions [@election_reverse]. Despite the fact that Clinton and the Democratic Party won by popular votes, the majority of the Electoral College votes went to Trump and the Republican Party, and thus, allowed Trump to assume the presidency.
+
+Even though the Democratic Party lost the election in 2016, over time, the Party is improving in some states, including Texas, which typically is a strong foothold for the Republican Party. The Lone Star State voted Republican for every presidential election, regardless of the national voter turnout, since President Reagan in 1980. Yet, the Democratic Party is gaining its ground in Texas over the years. Texas was one of the eleven states where Clinton improved on President Obama's reelection in 2012, and Clinton lost Texas by a smaller margin than any Democrat since 1996 [@tx_vote_his].
+
+The change we observed in the 2016 Election could potentially be attributed to different factors. For one, diversity in Texas has been changing over the years. Texas has been a popular gateway for Mexican immigrants in to the US due to its geographic proximity. Since 1980, the number of Mexican immigrants in Texas has been in a constant increase. Also, the economic status of residents in Texas has also been changing. Historically, Texas has been a state that relied on farming and natural resources like timber and oil [@tx_his]. After World War II, new technologies and industries changed Texas' economic infrastructure. Understanding how these factors played out in the 2016 election helps us understand the political dynamics of Texas, and will help us better predict election results in the coming years. Therefore, our focus for this project turns to how different demographic and economic factors played a role in the 2016 election results. 

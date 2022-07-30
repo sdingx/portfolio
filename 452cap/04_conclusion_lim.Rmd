@@ -1,0 +1,33 @@
+```{r, include=FALSE}
+library(dplyr)
+library(readr)
+library(stringr)
+library(tidyverse)
+library(tidycensus)
+library(tigris)
+library(ggplot2)
+library(sf)
+library(spatialreg)
+library(spdep)
+library(splines)
+```
+
+# Conclusion
+
+Throughout our study of Texas' county voting habits in the 2016 Presidential Election, we have drawn three main conclusions from our analysis. 
+
+The first is that counties along the Texas-Mexico border have an undersized influence because they have the lowest voter turnout rates in the state. Coincidentally, these counties also have the highest rates of Hispanic and foreign-born people which minimizes the impact of these voices when voting in Texas. While we are only analyzing this at the Presidential level, this could also be assumed in midterm and state-wide elections as well. Since these counties voted democratically, counter to the rest of the state, it could be reasonably deduced that these counties do not have as strong get out the vote initiatives compared to the rest of the state.
+
+Second, counties with high voter turnout deficit, high foreign-born rates and low-income tend to vote more democratically in Texas. These variables have the lowest estimates in our Queen SAR and estimates that are below the intercept (-1.35) tend to mean that they will vote democratically. All three of these variables are below .062 which shows that they would have little impact on the large negative (democratic) intercept.
+
+Third if a county has more than a 70% white population, it is almost certain that that county will vote Republican. We derived this by looking at the white estimate which is 2.37. If we take this estimate and multiply it by .7 to stand for 70% of the population being white, we end up with 1.659, which is a full standard error larger than the estimate. This means that if a Texas county has over a 70% White population, it is almost certain that they voted for the Republican candidate in 2016.
+
+# Limitations
+
+Some of the limitations that we encountered during our analysis was not having access to all of the data we wanted. For example, we were missing key data, such as voter registration stats, for five counties and as a result, we just could not use them in our analysis. 
+
+Also, because the county-level data for 2020's presidential election is not available yet, we ended up choosing the 2016 election, which results in inaccuracies in some data. This is due to the fact that county-level census data is only available every 10 years (ex. 2010 or 2020). When we are using census data, we would have to choose data that is not 2016, just because of this unavailability.
+
+If we had more time, I think we would have looked at more variables beyond demographics and income to try and get a deeper understanding for votes in Texas. I also think if this could be done in another time in the future, we could have looked at the 2020 election and done a comparison between the two elections in Texas to see what changed and possibly why those changes occurred.
+
+# References

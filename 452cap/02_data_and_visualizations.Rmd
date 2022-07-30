@@ -1,0 +1,85 @@
+```{r, include=FALSE}
+library(dplyr)
+library(readr)
+library(stringr)
+library(tidyverse)
+library(tidycensus)
+library(tigris)
+library(ggplot2)
+library(sf)
+library(spatialreg)
+library(spdep)
+library(splines)
+library(ggpubr)
+```
+
+# Data
+
+Here, we introduce the data sets we used to conduct this analysis. Because election results does not cover the demographic or economic factors that we will use, we need to join several data sets together to create the analysis and the visualizations that we might need.
+
+Our main data set that contains all of the counties in Texas, their voting statistics and the amount of votes each candidate received from each county came from the [US Census](https://data.census.gov/cedsci/). Once we downloaded this data, we cleaned the data by removing unnecessary variables that did not have any impact on voting results and changed the county names so that they were in an identical style. This was our principle data set that we joined all of the following data sets to. The next, is our data set that included voter registration figures from 2016, gathered from [Texas Secretary of State](https://www.sos.state.tx.us/elections/historical/nov2016.shtml), and we combined that with our TX data set. 
+
+After that, we included data that had the population estimates from 2016 based off of data from the [TDC - Texas Demographic Center](https://demographics.texas.gov/data/tpepp/estimates/). We also combined this with our main TX data to show the proportion of registered voters as well as the proportion of actual voters from registration. 
+
+Next, we added two data sets that included 2016 demographic data by county and 2016 income data, both by county and both of these data sets came from the [Census](https://data.census.gov/cedsci/). The Demographics data included the amount of people that were of a certain race or ethnicity and the number of people in each county that were foreign-born. 
+
+The income data included only the average per-capita income of each county and we combined both of these data sets to the main TX data set. Lastly, we include two data sets that we use for visualizing, which includes the spatial county map of Texas, gathered from the [Tidycensus package in R](https://walker-data.com/tidycensus/), and data that adds the major cities in Texas, whose coordinated we acquired from [Google Maps](https://www.google.com/maps), to get a better understanding of where major city centers are located in Texas.
+
+# Visualizations
+
+The first visualization we wanted to look at from our data was to see which candidates won each of the different counties in Texas and the margin of victory held in each county.
+
+```{r, echo=FALSE, warning=FALSE}
+txwinning %>%
+  st_make_valid() %>%
+  ggplot() +
+  geom_sf(aes(fill = candidate),color = "grey", size = 0.25, alpha = .8) + theme_void() +
+  geom_sf_text(data = majorcities %>% filter(!(city  == 'Fort Worth')), mapping = aes(label = city), color = "black") + 
+  scale_fill_manual(values = c("#CC2B1D", "#0023B3")) +
+  labs(title = "2016 Candidate Victories by County in Texas", fill = 'Winning Candidate')
+
+txwinning %>%
+  st_make_valid() %>%
+  ggplot() +
+  geom_sf(aes(fill = vote_diff_RD),color = "grey",size = 0.25,alpha=.8) + theme_void() + 
+  geom_sf_text(data = majorcities%>% filter(!(city  == 'Fort Worth')), mapping = aes(label = city), color = "black") + 
+  scale_fill_gradient2(mid = "white", high = "#CC2B1D", low = "#0023B3")  +
+  labs(title = "2016 Candidate Margin of Victory in Texas", fill = 'Voter Difference (Trump - Clinton)')
+```
+
+As you can see, many of the counties voted in favor of Republican Donald Trump, which is not a surprise seeing that Texas as a state has leaned Republican in every Presidential election since 1976 when Jimmy Carter won there. However, what we do notice is that around metropolitan/city centers, more people voted for Clinton, but more surprisingly, many along the Texas-Mexico border also voted in favor of Hillary Clinton. These counties became a focus for us as we began to look deeper into the results of the election. (Also there are counties on these maps that are white and that is because these counties did not have enough data in the census for us to include them in our analysis.)
+
+Next, we wanted to look at demographic data across Texas so that we can gain more of an understanding of where certain demographics are located within the state.
+
+```{r, echo=FALSE, warning=FALSE}
+tx %>%
+  filter(vr_prop < 1) %>% 
+  st_make_valid() %>%
+  ggplot() + 
+  geom_sf(aes(fill = hispanic), color = "black", size = .25) + theme_void() + 
+  geom_sf_text(data = majorcities%>% filter(!(city  == 'Fort Worth')), mapping = aes(label = city), color = "gold") +
+  labs(title = "2016 Hispanic Voters in Texas", fill = 'Proportion of Voters that are Hispanic')
+
+tx %>%
+  filter(vr_prop < 1) %>% 
+  st_make_valid() %>%
+  ggplot() + 
+  geom_sf(aes(fill = white), color = "black", size = .25) + theme_void() + 
+  geom_sf_text(data = majorcities%>% filter(!(city  == 'Fort Worth')), mapping = aes(label = city), color = "gold") +
+  labs(title = "2016 White Voters in Texas", fill = 'Proportion of Voters that are White')
+```
+
+These maps give a very stark representation into where the two predominant race/ethnicities, White and Hispanic, are located in Texas. The further Southwest or closer the counties are to the Mexican border, we see a higher proportion of voters that are Hispanic and the farther Northeast or farther away from the border, we see a higher proportion of white voters. While this may make a lot of sense, I want you to keep this in mind as we look at our next visualization set.
+
+Texas is notoriously bad at getting its registered voters to actually get to the voting booth and is consistently ranked as one of the worst states at getting voters to turnout in national elections. So, in this visualization, we analyzed how far away each county is from the national average of 60% [Statista](https://www.statista.com/statistics/632113/2016-us-presidential-election-voter-turnout-by-state/).
+
+```{r, echo=FALSE, warning=FALSE}
+txwinning %>%
+  ggplot() + 
+  geom_sf(aes(fill = deficit), color = "black", size = .25) + theme_void() + 
+  geom_sf_text(data = majorcities%>% filter(!(city  == 'Fort Worth')), mapping = aes(label = city), color = "black") + 
+  scale_fill_gradient2(mid = "white", high = "red", low = "green") +
+  labs(title = "Voter Turnout Deficit Compared to National Average", fill = "Deficit")
+```
+
+In this visualization, the counties that are in green are above the national average in voter turnout, counties in white at the national average and counties in red are below the national average. Counties that are more red are farther below the national average and the counties that are the most red along the Texas-Mexican border, which has a higher majority of Hispanic voters. 
